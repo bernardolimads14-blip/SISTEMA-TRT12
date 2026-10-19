@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel de Tarefas</title>
+<style>
+:root{font-family:Inter,system-ui,Arial,sans-serif;color:#182230;background:#f3f6fb}
+*{box-sizing:border-box}body{margin:0}header{background:#172554;color:#fff;padding:18px 22px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+main{max-width:1120px;margin:24px auto;padding:0 16px}.card{background:#fff;border:1px solid #e3e8f0;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 4px 16px #1725540a}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.stats{font-size:28px;font-weight:750}.muted{color:#667085;font-size:14px}
+input,select,textarea,button{font:inherit;padding:11px 12px;border-radius:8px;border:1px solid #cbd5e1;width:100%;margin:5px 0}
+button{cursor:pointer;background:#1d4ed8;color:white;border:0;font-weight:650}button.secondary{background:#e8edf5;color:#182230}button.danger{background:#b42318}
+form .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button{width:auto}.hidden{display:none!important}
+.item{border:1px solid #e4e7ec;border-radius:10px;padding:13px;margin:10px 0}.item h3{margin:0 0 7px}
+.item p{white-space:pre-wrap;overflow-wrap:anywhere}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{width:auto}
+#message{white-space:pre-wrap}.tag{display:inline-block;background:#eef2ff;color:#3730a3;padding:3px 8px;border-radius:20px;font-size:12px}
+@media(max-width:600px){form .two{grid-template-columns:1fr}header{align-items:flex-start}}
+</style>
+</head>
+<body>
+<header><div><strong>PAINEL DE TAREFAS</strong><div class="muted" style="color:#c7d2fe">Jovem Aprendiz · Diretoria de Secretaria</div></div><div id="headerUser"></div></header>
+<main>
+<p id="message" role="status">Carregando sistema...</p>
+<section id="auth" class="card hidden">
+<div class="grid">
+<div><h2>Entrar</h2><form id="loginForm"><input id="loginEmail" type="email" placeholder="E-mail" autocomplete="email" required><input id="loginPassword" type="password" placeholder="Senha" autocomplete="current-password" required><button>Entrar</button></form><button id="forgot" class="secondary">Recuperar senha</button></div>
+<div><h2>Criar conta</h2><form id="signupForm"><input id="name" placeholder="Nome completo" maxlength="120" required><input id="signupEmail" type="email" placeholder="E-mail" autocomplete="email" required><input id="signupPassword" type="password" placeholder="Senha (mín. 8 caracteres)" minlength="8" autocomplete="new-password" required><button>Cadastrar</button></form><p class="muted">Novas contas recebem inicialmente o cargo Jovem Aprendiz. A alteração de cargo é feita pelo responsável no banco.</p></div>
+</div></section>
+<div id="app" class="hidden">
+<nav class="tabs card"><button data-tab="home">Painel</button><button data-tab="tasks">Tarefas diárias</button><button data-tab="extras">Atividades extras</button><button data-tab="logs">Registro de tudo</button><button id="logout" class="secondary">Sair</button></nav>
+<section id="home" class="tabview">
+<div class="grid"><div class="card"><div class="muted">Pendentes</div><div class="stats" id="pendingCount">0</div></div><div class="card"><div class="muted">Em andamento</div><div class="stats" id="progressCount">0</div></div><div class="card"><div class="muted">Concluídas</div><div class="stats" id="doneCount">0</div></div></div>
+<div class="card"><h2>Visão geral</h2><p id="welcome"></p><p class="muted">Os dois cargos podem administrar tarefas e consultar o histórico completo.</p></div>
+</section>
+<section id="tasks" class="tabview hidden"><div class="card"><h2>Nova tarefa diária</h2><form id="taskForm"><input name="title" placeholder="Título da tarefa" maxlength="180" required><textarea name="description" placeholder="Descrição" rows="3"></textarea><div class="two"><label>Data<input name="task_date" type="date" required></label><label>Prazo<input name="due_date" type="date"></label><label>Prioridade<select name="priority"><option value="baixa">Baixa</option><option value="normal" selected>Normal</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></label><label>Responsável<select name="assigned_to" class="people"><option value="">Sem atribuição</option></select></label></div><button>Criar tarefa</button></form></div><div class="card"><h2>Tarefas diárias</h2><div id="taskList"></div></div></section>
+<section id="extras" class="tabview hidden"><div class="card"><h2>Nova atividade extra</h2><form id="extraForm"><input name="title" placeholder="Título da atividade" maxlength="180" required><textarea name="description" placeholder="Descrição" rows="3"></textarea><div class="two"><label>Prazo<input name="due_date" type="date"></label><label>Prioridade<select name="priority"><option value="baixa">Baixa</option><option value="normal" selected>Normal</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></label><label>Responsável<select name="assigned_to" class="people"><option value="">Sem atribuição</option></select></label><label>Status<select name="status"><option value="pendente">Pendente</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluída</option><option value="cancelada">Cancelada</option></select></label></div><button>Criar atividade extra</button></form></div><div class="card"><h2>Atividades extras</h2><div id="extraList"></div></div></section>
+<section id="logs" class="tabview hidden"><div class="card"><h2>Registro de tudo</h2><p class="muted">Histórico criado automaticamente pelo banco. Registros não podem ser alterados ou apagados pela interface.</p><button id="refreshLogs" class="secondary">Atualizar registros</button><div id="logList"></div></div></section>
+</div>
+</main>
+<script type="module">
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+// Substitua pelos valores em Supabase > Project Settings > API Keys.
+const SUPABASE_URL='COLE_A_URL_DO_PROJETO';
+const SUPABASE_KEY='COLE_A_CHAVE_PUBLICAVEL';
+const $=s=>document.querySelector(s);
+const msg=t=>$('#message').textContent=t;
+if(SUPABASE_URL.includes('COLE_')||SUPABASE_KEY.includes('COLE_')){msg('Configure a URL e a chave publicável do Supabase neste arquivo.');$('#auth').classList.remove('hidden');throw Error('Configure as credenciais.');}
+const db=createClient(SUPABASE_URL,SUPABASE_KEY);
+let user=null, profiles=[], tasks=[], extras=[];
+const today=()=>new Date().toLocaleDateString('en-CA');
+$('input[name="task_date"]').value=today();
+function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
+function safeError(e){msg('Não foi possível concluir: '+(e?.message||'erro desconhecido'));}
+async function act(fn,success){msg('Processando...');const {data,error}=await fn();if(error){safeError(error);return null;}if(success)msg(success);return data??true;}
+function formObject(form){return Object.fromEntries(new FormData(form).entries());}
+function setOptions(){document.querySelectorAll('select.people').forEach(s=>{const v=s.value;s.replaceChildren(el('option','','Sem atribuição'));for(const p of profiles){const o=el('option','',`${p.full_name||p.email||p.id.slice(0,8)} — ${p.role==='diretor_secretaria'?'Diretor de Secretaria':'Jovem Aprendiz'}`);o.value=p.id;s.append(o);}s.value=v;});}
+function statusLabel(s){return ({pendente:'Pendente',em_andamento:'Em andamento',concluida:'Concluída',cancelada:'Cancelada'})[s]||s;}
+function priorityLabel(s){return ({baixa:'Baixa',normal:'Normal',alta:'Alta',urgente:'Urgente'})[s]||s;}
+function person(id){const p=profiles.find(x=>x.id===id);return p?(p.full_name||p.email||'Usuário'): 'Sem atribuição';}
+function renderList(containerId,items,table){const root=$(containerId);root.replaceChildren();if(!items.length){root.append(el('p','muted','Nenhum registro encontrado.'));return;}
+for(const t of items){const box=el('article','item');box.append(el('h3','',t.title));if(t.description)box.append(el('p','',t.description));box.append(el('div','muted',`Responsável: ${person(t.assigned_to)} · Prioridade: ${priorityLabel(t.priority)} · Status: ${statusLabel(t.status)}`));box.append(el('div','muted',`Criado em ${new Date(t.created_at).toLocaleString('pt-BR')}`));
+const row=el('div','row');const select=el('select');for(const s of ['pendente','em_andamento','concluida','cancelada']){const o=el('option','',statusLabel(s));o.value=s;select.append(o);}select.value=t.status;const save=el('button','','Salvar status');save.addEventListener('click',async()=>{const result=await act(()=>db.from(table).update({status:select.value}).eq('id',t.id),'Status atualizado.');if(result)await loadAll();});const remove=el('button','danger','Excluir');remove.addEventListener('click',async()=>{if(!confirm('Excluir este registro? A ação será registrada no histórico.'))return;const result=await act(()=>db.from(table).delete().eq('id',t.id),'Registro excluído.');if(result)await loadAll();});row.append(select,save,remove);box.append(row);root.append(box);}}
+async function loadAll(){const [p,t,x]=await Promise.all([db.from('profiles').select('id,email,full_name,role').order('created_at'),db.from('tasks').select('*').order('task_date',{ascending:false}),db.from('extra_activities').select('*').order('created_at',{ascending:false})]);if(p.error||t.error||x.error){safeError(p.error||t.error||x.error);return;}profiles=p.data||[];tasks=t.data||[];extras=x.data||[];setOptions();renderList('#taskList',tasks,'tasks');renderList('#extraList',extras,'extra_activities');$('#pendingCount').textContent=[...tasks,...extras].filter(x=>x.status==='pendente').length;$('#progressCount').textContent=[...tasks,...extras].filter(x=>x.status==='em_andamento').length;$('#doneCount').textContent=[...tasks,...extras].filter(x=>x.status==='concluida').length;const me=profiles.find(p=>p.id===user.id);$('#welcome').textContent=`Olá, ${me?.full_name||user.email}. Cargo: ${me?.role==='diretor_secretaria'?'Diretor de Secretaria':'Jovem Aprendiz'}.`; }
+async function loadLogs(){const result=await act(()=>db.from('audit_logs').select('id,actor_id,action,entity_table,entity_id,occurred_at,old_data,new_data').order('occurred_at',{ascending:false}).limit(300));if(!result)return;const root=$('#logList');root.replaceChildren();if(!result.length){root.append(el('p','muted','Ainda não há registros.'));return;}for(const log of result){const box=el('article','item');const actor=profiles.find(p=>p.id===log.actor_id);box.append(el('strong','',`${log.action} · ${log.entity_table}`));box.append(el('p','muted',`Por ${actor?.full_name||actor?.email||'Usuário/sistema'} · ${new Date(log.occurred_at).toLocaleString('pt-BR')} · ID ${log.entity_id||'—'}`));const data=log.new_data||log.old_data;if(data)box.append(el('details',''));if(data){const d=box.lastChild;d.append(el('summary','','Detalhes do registro'));const pre=el('pre','',JSON.stringify(data,null,2));pre.style.overflowX='auto';d.append(pre);}root.append(box);}}
+function showTab(id){document.querySelectorAll('.tabview').forEach(x=>x.classList.toggle('hidden',x.id!==id));}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',async()=>{showTab(b.dataset.tab);if(b.dataset.tab==='logs')await loadLogs();}));
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();const r=await act(()=>db.auth.signInWithPassword({email:$('#loginEmail').value.trim(),password:$('#loginPassword').value}),'Login realizado.');if(r)await refresh();});
+$('signupForm').addEventListener('submit',async e=>{e.preventDefault();const full_name=$('#name').value.trim();const r=await act(()=>db.auth.signUp({email:$('#signupEmail').value.trim(),password:$('#signupPassword').value,options:{data:{full_name}}}));if(r){msg(r.session?'Conta criada.':'Cadastro criado. Confira seu e-mail para confirmar a conta.');await refresh();}});
+$('#forgot').addEventListener('click',async()=>{const email=$('#loginEmail').value.trim();if(!email){msg('Informe seu e-mail no campo de login.');return;}await act(()=>db.auth.resetPasswordForEmail(email,{redirectTo:location.href}),'Se o e-mail estiver cadastrado, as instruções serão enviadas.');});
+$('#taskForm').addEventListener('submit',async e=>{e.preventDefault();const f=formObject(e.currentTarget);const payload={title:f.title.trim(),description:f.description,task_date:f.task_date||today(),due_date:f.due_date||null,priority:f.priority,assigned_to:f.assigned_to||null,created_by:user.id};const r=await act(()=>db.from('tasks').insert(payload),'Tarefa criada.');if(r){e.currentTarget.reset();$('input[name="task_date"]').value=today();await loadAll();}});
+$('#extraForm').addEventListener('submit',async e=>{e.preventDefault();const f=formObject(e.currentTarget);const payload={title:f.title.trim(),description:f.description,due_date:f.due_date||null,priority:f.priority,status:f.status,assigned_to:f.assigned_to||null,created_by:user.id};const r=await act(()=>db.from('extra_activities').insert(payload),'Atividade extra criada.');if(r){e.currentTarget.reset();await loadAll();}});
+$('#refreshLogs').addEventListener('click',loadLogs);
+$('#logout').addEventListener('click',async()=>{const {error}=await db.auth.signOut();if(error)safeError(error);await refresh();});
+async function refresh(){const {data,error}=await db.auth.getSession();if(error){safeError(error);return;}user=data.session?.user||null;$('#auth').classList.toggle('hidden',!!user);$('#app').classList.toggle('hidden',!user);$('#headerUser').textContent=user?user.email:'';if(!user){profiles=[];tasks=[];extras=[];msg('Entre ou crie uma conta para acessar o sistema.');return;}msg('Sessão autenticada.');await loadAll();}
+db.auth.onAuthStateChange(()=>{setTimeout(refresh,0);});
+await refresh();
+</script>
+</body></html>
