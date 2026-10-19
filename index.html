@@ -42,8 +42,8 @@ form .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 <script type="module">
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 // Substitua pelos valores em Supabase > Project Settings > API Keys.
-const SUPABASE_URL='COLE_A_URL_DO_PROJETO';
-const SUPABASE_KEY='COLE_A_CHAVE_PUBLICAVEL';
+const SUPABASE_URL='https://abuddtbmgtxsoztnedle.supabase.co';
+const SUPABASE_KEY='sb_publishable_JPK4BuZlAhrzR-wrjjhu6A_6fuwTzka';
 const $=s=>document.querySelector(s);
 const msg=t=>$('#message').textContent=t;
 if(SUPABASE_URL.includes('COLE_')||SUPABASE_KEY.includes('COLE_')){msg('Configure a URL e a chave publicável do Supabase neste arquivo.');$('#auth').classList.remove('hidden');throw Error('Configure as credenciais.');}
