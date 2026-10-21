@@ -5,18 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Painel de Tarefas</title>
 <style>
-:root{font-family:Inter,system-ui,Arial,sans-serif;color:#182230;background:#f3f6fb}
-*{box-sizing:border-box}body{margin:0}header{background:#172554;color:#fff;padding:18px 22px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-main{max-width:1120px;margin:24px auto;padding:0 16px}.card{background:#fff;border:1px solid #e3e8f0;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 4px 16px #1725540a}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.stats{font-size:28px;font-weight:750}.muted{color:#667085;font-size:14px}
-input,select,textarea,button{font:inherit;padding:11px 12px;border-radius:8px;border:1px solid #cbd5e1;width:100%;margin:5px 0}
-button{cursor:pointer;background:#1d4ed8;color:white;border:0;font-weight:650}button.secondary{background:#e8edf5;color:#182230}button.danger{background:#b42318}
-form .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button{width:auto}.hidden{display:none!important}
-.item{border:1px solid #e4e7ec;border-radius:10px;padding:13px;margin:10px 0}.item h3{margin:0 0 7px}
-.item p{white-space:pre-wrap;overflow-wrap:anywhere}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{width:auto}
-#message{white-space:pre-wrap}.tag{display:inline-block;background:#eef2ff;color:#3730a3;padding:3px 8px;border-radius:20px;font-size:12px}
-@media(max-width:600px){form .two{grid-template-columns:1fr}header{align-items:flex-start}}
+:root{font-family:Inter,system-ui,Arial,sans-serif;color:#e5e7eb;background:#090d16;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#111b31 0%,#090d16 55%);min-height:100vh;color:#e5e7eb}
+header{background:#0d1322;color:#f8fafc;padding:20px 24px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid #263248;box-shadow:0 8px 30px #0005}
+header strong{letter-spacing:1.4px;font-size:16px}main{max-width:1120px;margin:26px auto;padding:0 16px}
+.card{background:#111827;border:1px solid #263248;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 8px 26px #0002}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.stats{font-size:30px;font-weight:800;color:#93c5fd}.muted{color:#9ca3af;font-size:14px}
+h2{font-size:18px;margin:0 0 14px;color:#f3f4f6}p{line-height:1.55}
+input,select,textarea,button{font:inherit;padding:12px 13px;border-radius:10px;border:1px solid #374151;width:100%;margin:5px 0;background:#0b1220;color:#e5e7eb;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #3b82f633}
+input::placeholder,textarea::placeholder{color:#6b7280}button{cursor:pointer;background:#2563eb;color:white;border:1px solid #3b82f6;font-weight:700;transition:background .15s,transform .15s}button:hover{background:#1d4ed8;transform:translateY(-1px)}button.secondary{background:#1f2937;color:#e5e7eb;border-color:#374151}button.secondary:hover{background:#374151}button.danger{background:#991b1b;border-color:#b91c1c}button.danger:hover{background:#b91c1c}
+form .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tabs button{width:auto;flex:1 1 auto}.hidden{display:none!important}
+.item{border:1px solid #2b3649;background:#0d1422;border-radius:12px;padding:15px;margin:10px 0}.item h3{margin:0 0 7px;color:#f9fafb}.item p{white-space:pre-wrap;overflow-wrap:anywhere}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{width:auto;flex:0 1 auto}
+#message{white-space:pre-wrap;background:#111827;border:1px solid #263248;padding:12px 14px;border-radius:10px;color:#cbd5e1}.tag{display:inline-block;background:#172554;color:#bfdbfe;padding:4px 9px;border-radius:20px;font-size:12px}
+details{margin-top:10px}summary{cursor:pointer;color:#93c5fd}pre{color:#d1d5db;background:#080d16;padding:12px;border-radius:8px}
+@media(max-width:600px){form .two{grid-template-columns:1fr}header{align-items:flex-start;padding:16px}main{margin:16px auto}.card{padding:15px}.tabs button{flex:1 1 40%}}
 </style>
 </head>
 <body>
@@ -66,8 +69,8 @@ async function loadAll(){const [p,t,x]=await Promise.all([db.from('profiles').se
 async function loadLogs(){const result=await act(()=>db.from('audit_logs').select('id,actor_id,action,entity_table,entity_id,occurred_at,old_data,new_data').order('occurred_at',{ascending:false}).limit(300));if(!result)return;const root=$('#logList');root.replaceChildren();if(!result.length){root.append(el('p','muted','Ainda não há registros.'));return;}for(const log of result){const box=el('article','item');const actor=profiles.find(p=>p.id===log.actor_id);box.append(el('strong','',`${log.action} · ${log.entity_table}`));box.append(el('p','muted',`Por ${actor?.full_name||actor?.email||'Usuário/sistema'} · ${new Date(log.occurred_at).toLocaleString('pt-BR')} · ID ${log.entity_id||'—'}`));const data=log.new_data||log.old_data;if(data)box.append(el('details',''));if(data){const d=box.lastChild;d.append(el('summary','','Detalhes do registro'));const pre=el('pre','',JSON.stringify(data,null,2));pre.style.overflowX='auto';d.append(pre);}root.append(box);}}
 function showTab(id){document.querySelectorAll('.tabview').forEach(x=>x.classList.toggle('hidden',x.id!==id));}
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',async()=>{showTab(b.dataset.tab);if(b.dataset.tab==='logs')await loadLogs();}));
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();const r=await act(()=>db.auth.signInWithPassword({email:$('#loginEmail').value.trim(),password:$('#loginPassword').value}),'Login realizado.');if(r)await refresh();});
-$('signupForm').addEventListener('submit',async e=>{e.preventDefault();const full_name=$('#name').value.trim();const r=await act(()=>db.auth.signUp({email:$('#signupEmail').value.trim(),password:$('#signupPassword').value,options:{data:{full_name}}}));if(r){msg(r.session?'Conta criada.':'Cadastro criado. Confira seu e-mail para confirmar a conta.');await refresh();}});
+$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const r=await act(()=>db.auth.signInWithPassword({email:$('#loginEmail').value.trim(),password:$('#loginPassword').value}),'Login realizado.');if(r)await refresh();});
+$('#signupForm').addEventListener('submit',async e=>{e.preventDefault();const full_name=$('#name').value.trim();const r=await act(()=>db.auth.signUp({email:$('#signupEmail').value.trim(),password:$('#signupPassword').value,options:{data:{full_name}}}));if(r){msg(r.session?'Conta criada.':'Cadastro criado. Confira seu e-mail para confirmar a conta.');await refresh();}});
 $('#forgot').addEventListener('click',async()=>{const email=$('#loginEmail').value.trim();if(!email){msg('Informe seu e-mail no campo de login.');return;}await act(()=>db.auth.resetPasswordForEmail(email,{redirectTo:location.href}),'Se o e-mail estiver cadastrado, as instruções serão enviadas.');});
 $('#taskForm').addEventListener('submit',async e=>{e.preventDefault();const f=formObject(e.currentTarget);const payload={title:f.title.trim(),description:f.description,task_date:f.task_date||today(),due_date:f.due_date||null,priority:f.priority,assigned_to:f.assigned_to||null,created_by:user.id};const r=await act(()=>db.from('tasks').insert(payload),'Tarefa criada.');if(r){e.currentTarget.reset();$('input[name="task_date"]').value=today();await loadAll();}});
 $('#extraForm').addEventListener('submit',async e=>{e.preventDefault();const f=formObject(e.currentTarget);const payload={title:f.title.trim(),description:f.description,due_date:f.due_date||null,priority:f.priority,status:f.status,assigned_to:f.assigned_to||null,created_by:user.id};const r=await act(()=>db.from('extra_activities').insert(payload),'Atividade extra criada.');if(r){e.currentTarget.reset();await loadAll();}});
