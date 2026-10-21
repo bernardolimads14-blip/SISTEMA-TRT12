@@ -32,13 +32,45 @@ const KEY='trt12_dark_tasks_v3',ROLE_KEY='trt12_dark_role_v3';
 const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
 const state={tasks:[],extras:[],logs:[],role:localStorage.getItem(ROLE_KEY)||'Jovem Aprendiz',view:'dashboard'};
 const statusOptions=['Novo','Em andamento','Concluída','Cancelada'];
+// Google Planilhas: depois de publicar o Apps Script como Aplicativo da Web,
+// cole aqui a URL terminada em /exec. Não coloque chaves ou senhas neste arquivo.
+const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwe7W0piwB7DgZyeI-FmegWGxLQNTJCVHTFdSa_eAnAUyfTlrdjx1vAgB0gITOlQGgj/exec';
+function syncToGoogleSheet(action,type,item,extra={}){
+  if(!GOOGLE_SHEETS_WEB_APP_URL || GOOGLE_SHEETS_WEB_APP_URL.includes('COLE_AQUI')) return;
+  const payload={
+    source:'SISTEMA-TRT12',
+    action:String(action||'Registro'),
+    type:type==='tasks'?'Tarefa':'Atividade',
+    title:item?.title||'',
+    status:item?.status||'',
+    completed:(item?.status==='Concluída'||item?.checklisted===true),
+    role:state.role,
+    timestamp:item?.at||new Date().toISOString(),
+    details:extra.details||'',
+    rows:extra.rows||null
+  };
+  // Apps Script recebe text/plain para evitar preflight CORS em GitHub Pages.
+  // no-cors não permite ler a resposta; o envio é assíncrono.
+  try {
+    fetch(GOOGLE_SHEETS_WEB_APP_URL,{
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(payload), keepalive:true
+    }).catch(err=>console.warn('Falha ao enviar log para Google Planilhas:',err));
+  } catch(err) { console.warn('Falha ao enviar log para Google Planilhas:',err); }
+}
+
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const uid=()=>Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dateLabel=s=>{if(!s)return 'Sem prazo';const d=new Date(s+'T12:00:00');return isNaN(d)?s:d.toLocaleDateString('pt-BR')};
 function persist(){try{localStorage.setItem(KEY,JSON.stringify({tasks:state.tasks,extras:state.extras,logs:state.logs}));}catch(e){toast('Não foi possível salvar neste navegador. Verifique o armazenamento.')}}
 function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2700)}
-function log(action,type,item){state.logs.unshift({id:uid(),action,type,title:item.title||'Atividade',at:new Date().toISOString(),status:item.status||'',role:state.role});state.logs=state.logs.slice(0,300);persist()}
+function log(action,type,item){
+  const entry={id:uid(),action,type,title:item.title||'Atividade',at:new Date().toISOString(),status:item.status||'',role:state.role};
+  state.logs.unshift(entry);state.logs=state.logs.slice(0,300);persist();
+  syncToGoogleSheet(action,type,{...item,at:entry.at});
+}
 function setRole(role){state.role=role;localStorage.setItem(ROLE_KEY,role);$('#roleSelect').value=role;$('#roleSummary').textContent=role;$('#avatar').textContent=role==='Jovem Aprendiz'?'JA':'DS';toast('Cargo alterado para '+role+'.')}
 function switchView(view){state.view=view;$$('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+view));$$('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));const names={dashboard:['Visão geral','Acompanhe suas tarefas e mantenha tudo em ordem.'],tasks:['Tarefas diárias','Planeje, acompanhe e conclua suas tarefas.'],extras:['Atividades extras','Organize as demandas adicionais do seu dia.'],history:['Histórico','Confira as alterações registradas neste navegador.']};$('#crumbName').textContent=names[view][0];$('#pageTitle').textContent=names[view][0];$('#pageSubtitle').textContent=names[view][1];$('#sidebar').classList.remove('open');renderAll()}
 function badge(status){const c={'Novo':'new','Pendente':'pending','Em andamento':'progress','Concluída':'done','Cancelada':'cancel'}[status]||'pending';return `<span class="badge ${c}">${esc(status)}</span>`}
@@ -51,7 +83,7 @@ function renderAll(){renderDashboard();renderItems('tasks');renderItems('extras'
 function formData(form){return Object.fromEntries(new FormData(form).entries())}
 function createItem(form,type){const f=formData(form),title=(f.title||'').trim();if(!title){toast('Informe um título para continuar.');return}const item={id:uid(),title,description:(f.description||'').trim(),date:f.date||today(),due:f.due||'',priority:f.priority||'Normal',assignee:(f.assignee||'').trim(),status:'Novo',createdAt:new Date().toISOString(),kind:type};state[type].unshift(item);log('Criada',type,item);persist();form.reset();renderAll();toast(type==='tasks'?'Tarefa criada com sucesso!':'Atividade extra criada com sucesso!')}
 function editItem(type,id){const item=state[type].find(x=>x.id===id);if(!item)return;const title=prompt('Editar título:',item.title);if(title===null)return;if(!title.trim()){toast('O título não pode ficar vazio.');return}const description=prompt('Editar descrição:',item.description||'');if(description===null)return;item.title=title.trim();item.description=description.trim();log('Editada',type,item);persist();renderAll();toast('Atividade atualizada.')}
-function sendDayToLog(){const total=state.tasks.length;if(!total||state.tasks.some(x=>!x.checklisted)){toast('Marque todas as tarefas no checklist antes de enviar.');return}const stamp=new Date();const day=stamp.toLocaleDateString('pt-BR');const snapshot={id:uid(),action:'Resumo do dia enviado',type:'tasks',title:`Checklist diário — ${day}`,at:stamp.toISOString(),role:state.role,status:`${total}/${total} marcadas`,snapshot:state.tasks.map(x=>({title:x.title,status:x.status,checklisted:!!x.checklisted,}))};state.logs.unshift(snapshot);state.logs=state.logs.slice(0,300);persist();renderHistory();toast('Resumo enviado para o log. Suas tarefas foram mantidas como estavam.')}
+function sendDayToLog(){const total=state.tasks.length;if(!total||state.tasks.some(x=>!x.checklisted)){toast('Marque todas as tarefas no checklist antes de enviar.');return}const stamp=new Date();const day=stamp.toLocaleDateString('pt-BR');const snapshot={id:uid(),action:'Resumo do dia enviado',type:'tasks',title:`Checklist diário — ${day}`,at:stamp.toISOString(),role:state.role,status:`${total}/${total} marcadas`,snapshot:state.tasks.map(x=>({title:x.title,status:x.status,checklisted:!!x.checklisted,}))};state.logs.unshift(snapshot);state.logs=state.logs.slice(0,300);persist();syncToGoogleSheet('Checklist enviado','tasks',snapshot,{details:snapshot.status,rows:state.tasks.map(x=>({title:x.title,status:x.status,completed:!!x.checklisted, type:'Tarefa'}))});renderHistory();toast('Resumo enviado para o log. Suas tarefas foram mantidas como estavam.')}
 function bindEvents(){$$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.go)));$('#menuBtn').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));$('#roleSelect').addEventListener('change',e=>setRole(e.target.value));$('#sendDayLog').addEventListener('click',sendDayToLog);$('#taskForm').addEventListener('submit',e=>{e.preventDefault();createItem(e.currentTarget,'tasks')});$('#extraForm').addEventListener('submit',e=>{e.preventDefault();createItem(e.currentTarget,'extras')});['#taskSearch','#taskFilter'].forEach(s=>$(s).addEventListener(s.includes('Search')?'input':'change',()=>renderItems('tasks')));['#extraSearch','#extraFilter'].forEach(s=>$(s).addEventListener(s.includes('Search')?'input':'change',()=>renderItems('extras')));document.addEventListener('change',e=>{const el=e.target;if(el.matches('[data-check-task]')){const item=state.tasks.find(x=>x.id===el.dataset.checkTask);if(item){item.checklisted=el.checked;log(el.checked?'Marcada no checklist':'Desmarcada no checklist','tasks',item);persist();renderItems('tasks');}return}if(!el.matches('[data-status-id]'))return;const type=el.dataset.type,item=state[type].find(x=>x.id===el.dataset.statusId);if(!item)return;item.status=el.value;log('Status alterado',type,item);persist();renderAll();toast('Status atualizado.')});document.addEventListener('click',e=>{const del=e.target.closest('[data-delete]'),edit=e.target.closest('[data-edit]');if(del){const type=del.dataset.type,item=state[type].find(x=>x.id===del.dataset.delete);if(!item)return;if(!confirm(`Excluir "${item.title}"?`))return;state[type]=state[type].filter(x=>x.id!==item.id);log('Excluída',type,item);persist();renderAll();toast('Atividade excluída.');}else if(edit){editItem(edit.dataset.type,edit.dataset.edit)}});$('#clearHistory').addEventListener('click',()=>{if(!state.logs.length){toast('O histórico já está vazio.');return}if(confirm('Limpar todo o histórico? As tarefas não serão apagadas.')){state.logs=[];persist();renderHistory();toast('Histórico limpo.')}});document.addEventListener('click',e=>{if(window.innerWidth<=760&&!e.target.closest('#sidebar')&&!e.target.closest('#menuBtn'))$('#sidebar').classList.remove('open')})}
 function init(){try{const saved=JSON.parse(localStorage.getItem(KEY)||'{}');state.tasks=Array.isArray(saved.tasks)?saved.tasks.map(x=>({...x,checklisted:!!x.checklisted})):[];state.extras=Array.isArray(saved.extras)?saved.extras:[];state.logs=Array.isArray(saved.logs)?saved.logs:[]}catch(e){state.tasks=[];state.extras=[];state.logs=[]}$('#todayLabel').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'long',year:'numeric'});$('#roleSelect').value=state.role;$('#roleSummary').textContent=state.role;$('#avatar').textContent=state.role==='Jovem Aprendiz'?'JA':'DS';bindEvents();renderAll()}
 init();
