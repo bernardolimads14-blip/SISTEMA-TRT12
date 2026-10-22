@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste LOG TRT12</title>
+<style>
+body{background:#10151f;color:#fff;font-family:Arial,sans-serif;padding:30px}
+main{max-width:500px;margin:40px auto;background:#1b2432;padding:25px;border-radius:12px}
+button{background:#2563eb;color:white;border:0;padding:14px;border-radius:8px;cursor:pointer;width:100%}
+</style>
+</head>
+<body>
+<main>
+<h2>SISTEMA TRT12</h2>
+<p>Teste de envio para a planilha Google.</p>
+<button id="enviar">Enviar registro de teste</button>
+<p id="resultado">Aguardando...</p>
+</main>
+<script>
+const URL_API="https://script.google.com/macros/s/AKfycbwACSGiQ74Gcmz5ujOsOym6dOdrRFI9NDF2haPOMZoESvV_wwtIbZs7Ujyra0jXPR0Z7Q/exec";
+
+document.getElementById("enviar").addEventListener("click",async()=>{
+const resultado=document.getElementById("resultado");
+resultado.textContent="Enviando...";
+const evento={
+tipoEvento:"Tarefa criada",
+categoria:"Tarefa",
+titulo:"TESTE DE ENVIO PELO SITE",
+descricao:"Teste de conexão HTML com Google Planilhas.",
+statusAnterior:"",
+statusAtual:"Nova",
+checklist:"Teste de integração",
+cargoAtivo:"Diretor de Secretaria",
+idItem:"TESTE-HTML-001"
+};
+try{
+await fetch(URL_API,{
+method:"POST",
+mode:"no-cors",
+headers:{"Content-Type":"text/plain;charset=utf-8"},
+body:JSON.stringify(evento)
+});
+resultado.textContent="Pedido enviado! Confira a planilha LOG_GERAL.";
+}catch(e){
+resultado.textContent="Erro no envio: "+e.message;
+}
+});
+</script>
+</body>
+</html>
