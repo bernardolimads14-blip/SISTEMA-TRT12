@@ -1,438 +1,48 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0b1120">
-<title>SISTEMA TRT12 | Gestão de atividades</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SISTEMA TRT12 | Gestão de Atividades</title>
 <style>
-:root{
-  --bg:#0b1120;--panel:#111a2b;--panel2:#152137;--line:#263650;
-  --text:#eef4ff;--muted:#9aaac2;--blue:#5b8cff;--blue2:#3568df;
-  --green:#39c99a;--amber:#f0b95b;--red:#ff737d;--radius:16px;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
-}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 15% 0%,#152442 0,transparent 38%),var(--bg);color:var(--text);min-height:100vh}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
-.sidebar{border-right:1px solid var(--line);background:rgba(9,15,28,.9);padding:22px 16px;display:flex;flex-direction:column;gap:24px}
-.brand{display:flex;align-items:center;gap:12px;padding:4px 8px 18px;border-bottom:1px solid var(--line)}
-.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#6e9cff,#3563d8);display:grid;place-items:center;font-weight:900;letter-spacing:-1px;box-shadow:0 8px 24px #315fbd55}
-.brand strong{display:block;font-size:14px;letter-spacing:.08em}
-.brand small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
-.nav-label{font-size:10px;color:#71829e;letter-spacing:.16em;font-weight:800;padding:0 12px;margin-bottom:8px}
-.nav{display:grid;gap:6px}
-.nav button{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:1px solid transparent;background:transparent;color:#aab9cf;text-align:left;border-radius:11px;font-weight:600;font-size:13px}
-.nav button .ico{width:22px;text-align:center;font-size:17px}
-.nav button.active,.nav button:hover{background:#182744;border-color:#2b4165;color:#fff}
-.sidebar-bottom{margin-top:auto;background:#111b2d;border:1px solid var(--line);border-radius:14px;padding:14px}
-.sidebar-bottom small{color:var(--muted);display:block;margin-bottom:8px}
-.sidebar-bottom strong{font-size:13px}
-main{min-width:0}
-.topbar{height:78px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:#0d1423cc;gap:16px}
-.crumb{color:var(--muted);font-size:12px}.crumb b{color:var(--text)}
-.top-actions{display:flex;align-items:center;gap:10px}
-select,.field,input,textarea{background:#0c1423;border:1px solid #2b3b55;border-radius:10px;color:var(--text);padding:11px 12px;outline:none;width:100%}
-select:focus,input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #5b8cff20}
-.role-select{width:auto;min-width:205px;padding:10px}
-.avatar{width:35px;height:35px;border-radius:11px;background:#203453;border:1px solid #3a5276;display:grid;place-items:center;font-weight:800}
-.content{padding:30px 32px 48px;max-width:1500px;margin:auto}
-.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px}
-.eyebrow{color:#83a8ff;font-size:11px;letter-spacing:.15em;font-weight:800;text-transform:uppercase;margin-bottom:9px}
-h1{font-size:clamp(25px,3vw,34px);letter-spacing:-.04em;margin:0 0 9px}
-.subtitle{color:var(--muted);font-size:13px;margin:0;line-height:1.6}
-.btn{border:1px solid #334969;background:#1a2942;color:#eaf1ff;padding:11px 15px;border-radius:10px;font-weight:700;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-.btn:hover{filter:brightness(1.13)}
-.btn.primary{background:linear-gradient(135deg,var(--blue),var(--blue2));border-color:#6894ff;color:white;box-shadow:0 8px 22px #3568df30}
-.btn.ghost{background:transparent}
-.btn.danger{color:#ffadb2;border-color:#673640;background:#2a1824}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:24px}
-.stat{background:linear-gradient(145deg,#142139,#101827);border:1px solid var(--line);border-radius:var(--radius);padding:18px;min-height:120px}
-.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
-.stat-icon{height:34px;width:34px;border-radius:10px;background:#233b63;display:grid;place-items:center;color:#a8c3ff;font-size:16px}
-.stat-value{font-size:29px;font-weight:800;letter-spacing:-.04em;margin-top:14px}
-.stat-note{font-size:11px;color:var(--muted);margin-top:4px}
-.panel{background:#101a2a;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line)}
-.panel-head h2{font-size:14px;margin:0}.panel-head p{font-size:11px;color:var(--muted);margin:5px 0 0}
-.panel-body{padding:18px 20px}
-.filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.filters input{max-width:260px}.filters select{width:auto;min-width:145px}
-.task-list{display:grid;gap:12px}
-.task-card{background:#111d30;border:1px solid #293b56;border-radius:14px;padding:16px;display:grid;gap:13px}
-.task-card.completed{border-color:#27644f;background:#10251f}
-.task-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
-.task-title{font-size:15px;font-weight:750;margin:0 0 6px;overflow-wrap:anywhere}
-.task-desc{font-size:12px;color:var(--muted);margin:0;line-height:1.55;overflow-wrap:anywhere}
-.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.badge{display:inline-flex;align-items:center;gap:5px;border:1px solid #34445f;background:#17243a;color:#b9c9e2;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:700}
-.badge.green{color:#8ce8c8;border-color:#28674f;background:#102c25}.badge.amber{color:#ffdb92;border-color:#6b542b;background:#302718}.badge.blue{color:#abc5ff;border-color:#334f84;background:#172747}
-.task-actions{display:flex;gap:7px;flex-wrap:wrap}
-.checklist{display:grid;gap:8px;border-top:1px solid #263650;padding-top:12px}
-.check-row{display:flex;align-items:flex-start;gap:10px;color:#dce6f5;font-size:12px;line-height:1.5}
-.check-row input{width:16px;height:16px;accent-color:var(--green);margin:1px 0 0;flex-shrink:0}
-.check-row.done span{text-decoration:line-through;color:#8192a9}
-.progress-line{height:5px;border-radius:10px;background:#25334a;overflow:hidden}.progress-line span{display:block;height:100%;background:linear-gradient(90deg,#4c82ff,#39c99a);border-radius:10px}
-.progress-label{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-bottom:6px}
-.empty{padding:36px 20px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed #34455f;border-radius:14px}
-.empty strong{display:block;color:#e1e9f7;font-size:15px;margin-bottom:7px}
-.grid-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
-.side-panel{display:grid;gap:14px;align-content:start}
-.quick-item{display:flex;gap:11px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #24334a}
-.quick-item:last-child{border-bottom:0;padding-bottom:0}
-.quick-icon{width:32px;height:32px;flex-shrink:0;border-radius:10px;background:#203657;display:grid;place-items:center}
-.quick-item strong{font-size:12px;display:block;margin-bottom:4px}.quick-item span{font-size:11px;color:var(--muted);line-height:1.45}
-.log-list{display:grid}
-.log-row{display:grid;grid-template-columns:130px minmax(0,1fr) auto;gap:14px;padding:14px 0;border-bottom:1px solid #263650;align-items:start}
-.log-row:last-child{border-bottom:0}
-.log-date{font-size:11px;color:var(--muted);line-height:1.5}
-.log-title{font-size:12px;font-weight:750;margin-bottom:5px}.log-detail{font-size:11px;color:var(--muted);line-height:1.5;overflow-wrap:anywhere}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.form-group{display:grid;gap:7px}.form-group label{font-size:11px;color:#b9c7dc;font-weight:750}
-.form-group.full{grid-column:1/-1}
-textarea{min-height:78px;resize:vertical}
-.check-inputs{display:grid;gap:8px}
-.check-input-row{display:flex;gap:8px}
-.check-input-row input{flex:1}
-.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-.toast{position:fixed;right:22px;bottom:22px;z-index:20;max-width:min(400px,calc(100vw - 32px));background:#15243a;border:1px solid #3b5274;border-radius:12px;padding:14px 16px;box-shadow:0 18px 60px #0008;font-size:12px;line-height:1.5}
-.toast.good{border-color:#287456}.toast.bad{border-color:#9d4d58}
-.small-muted{font-size:11px;color:var(--muted);line-height:1.55}
-.hidden{display:none!important}
-.mobile-menu{display:none}
-@media(max-width:1050px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-main{grid-template-columns:1fr}.side-panel{grid-template-columns:1fr 1fr}}
-@media(max-width:720px){
- .app{grid-template-columns:1fr}.sidebar{position:fixed;z-index:30;left:0;top:0;bottom:0;width:260px;transform:translateX(-105%);transition:transform .2s;box-shadow:20px 0 50px #0008}.sidebar.open{transform:translateX(0)}
- .topbar{height:66px;padding:0 16px}.mobile-menu{display:inline-flex}.crumb{display:none}.role-select{min-width:0;max-width:190px;font-size:11px}
- .content{padding:22px 15px 36px}.page-head{display:block}.page-head>.btn{margin-top:16px;width:100%}
- .stats{gap:9px}.stat{padding:14px;min-height:106px}.stat-value{font-size:24px}
- .panel-head,.panel-body{padding:15px}.filters input{max-width:none;width:100%}.filters select{flex:1;min-width:0}
- .task-top{display:block}.task-actions{margin-top:12px}.form-grid{grid-template-columns:1fr}.form-group.full{grid-column:auto}
- .side-panel{grid-template-columns:1fr}.log-row{grid-template-columns:1fr;gap:6px}.log-row .badge{justify-self:start}
-}
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#e9eef7;background:#0c111b;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.app{display:flex;min-height:100vh}.side{width:245px;background:#111a29;border-right:1px solid #263347;padding:25px 16px;flex-shrink:0}.brand{font-size:18px;font-weight:800;letter-spacing:.06em;padding:7px 10px 25px}.brand span{color:#6ea7ff}.side small{color:#8797ae}.nav{display:grid;gap:7px}.nav button{width:100%;text-align:left;padding:13px;border:0;border-radius:10px;color:#aab9ce;background:transparent}.nav button.active,.nav button:hover{background:#223650;color:#fff}.main{flex:1;min-width:0}.top{padding:18px 30px;border-bottom:1px solid #263347;display:flex;align-items:center;justify-content:space-between;gap:15px;background:#111827}.top strong{font-size:15px}.role{background:#182439;color:#dbe7f8;border:1px solid #364960;border-radius:9px;padding:9px;max-width:190px}.content{padding:32px;max-width:1250px;margin:auto}.eyebrow{color:#7aa9ff;font-size:12px;letter-spacing:.12em;font-weight:700;text-transform:uppercase}h1{margin:7px 0;font-size:30px}p.muted{color:#96a5ba;margin-top:0}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0}.stat,.panel{background:#151f2e;border:1px solid #2a3950;border-radius:14px;padding:20px}.stat small{color:#98a9bf}.stat b{display:block;font-size:28px;margin-top:8px}.panel{margin-top:20px}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:15px}.panelhead h2{font-size:18px;margin:0}.primary{background:#377de7;color:white;border:0;border-radius:9px;padding:11px 16px;font-weight:700}.secondary{background:#24364d;color:#e1ebfa;border:1px solid #3a4e68;border-radius:8px;padding:8px 12px}.danger{background:#402733;color:#ffb4bd;border:1px solid #704352;border-radius:8px;padding:7px 10px}.entry{border:1px solid #2b3a50;border-radius:11px;padding:15px;margin:10px 0;background:#192637}.entrytop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.entry h3{font-size:15px;margin:0 0 5px}.entry .desc{font-size:13px;color:#a8b8ce;white-space:pre-wrap}.meta{font-size:12px;color:#90a4bf;margin-top:9px}.checks{display:grid;gap:9px;margin:13px 0}.checks label{display:flex;gap:10px;align-items:center;font-size:14px}.checks input{accent-color:#4b95ff;width:17px;height:17px}.checks label.done{text-decoration:line-through;color:#7f90a5}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.pill{display:inline-block;border-radius:30px;padding:5px 9px;background:#283d55;color:#bcd7fa;font-size:11px}.pill.ok{background:#173e34;color:#8de0b9}.empty{color:#90a4bd;padding:30px;text-align:center;border:1px dashed #3b4b61;border-radius:10px}.formgrid{display:grid;gap:12px}.formgrid label{font-size:13px;color:#b5c6dd}.field{display:block;width:100%;background:#0d1725;color:#f3f7fd;border:1px solid #384c64;border-radius:8px;padding:11px;margin-top:5px}.formgrid textarea{min-height:80px;resize:vertical}.formrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hint{font-size:12px;color:#9eacc0}.log{padding:12px 0;border-bottom:1px solid #2b3a50;font-size:13px}.log:last-child{border:0}.log time{color:#879bb6}.notice{border:1px solid #645735;background:#2b281e;color:#f4dc98;padding:12px 15px;border-radius:10px;font-size:13px;margin-top:20px}.hidden{display:none!important}.toast{position:fixed;bottom:20px;right:20px;background:#233e59;color:white;padding:13px 18px;border:1px solid #537395;border-radius:10px;max-width:360px;box-shadow:0 10px 35px #0006;display:none}.toast.show{display:block}@media(max-width:750px){.app{display:block}.side{width:100%;padding:12px}.brand{padding:6px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.content{padding:20px 14px}.top{padding:14px}.stats{grid-template-columns:1fr 1fr}.formrow{grid-template-columns:1fr}}@media(max-width:430px){.stats{grid-template-columns:1fr}.panelhead{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand"><div class="brand-mark">12</div><div><strong>SISTEMA TRT12</strong><small>GESTÃO DE ROTINAS</small></div></div>
-    <div>
-      <div class="nav-label">WORKSPACE</div>
-      <nav class="nav">
-        <button class="active" data-page="inicio"><span class="ico">▦</span>Painel geral</button>
-        <button data-page="tarefas"><span class="ico">☷</span>Tarefas diárias</button>
-        <button data-page="atividades"><span class="ico">✦</span>Atividades extras</button>
-        <button data-page="historico"><span class="ico">◷</span>Registro de eventos</button>
-      </nav>
-    </div>
-    <div class="sidebar-bottom"><small>AMBIENTE ATIVO</small><strong>Rotinas e atividades</strong><p class="small-muted" style="margin:8px 0 0">Seus itens ficam salvos neste navegador. Os eventos são enviados para a planilha quando possível.</p></div>
-  </aside>
-
-  <main>
-    <header class="topbar">
-      <div style="display:flex;align-items:center;gap:12px"><button class="btn mobile-menu" id="menuBtn" aria-label="Abrir menu">☰</button><div class="crumb">Workspace / <b id="crumbPage">Painel geral</b></div></div>
-      <div class="top-actions"><select id="cargo" class="role-select" aria-label="Cargo ativo"><option>Diretor de Secretaria</option><option>Jovem Aprendiz</option></select><div class="avatar" id="avatar">DS</div></div>
-    </header>
-
-    <div class="content">
-      <section id="page-inicio" class="page">
-        <div class="page-head"><div><div class="eyebrow">VISÃO GERAL</div><h1>Bom trabalho.</h1><p class="subtitle">Acompanhe as rotinas, atividades e movimentações do sistema em um só lugar.</p></div><button class="btn primary" id="quickCreate">＋ Nova tarefa</button></div>
-        <div class="stats">
-          <div class="stat"><div class="stat-top"><span>Itens ativos</span><span class="stat-icon">☷</span></div><div class="stat-value" id="statActive">0</div><div class="stat-note">Tarefas e atividades em andamento</div></div>
-          <div class="stat"><div class="stat-top"><span>Concluídos</span><span class="stat-icon">✓</span></div><div class="stat-value" id="statDone">0</div><div class="stat-note">Itens concluídos neste navegador</div></div>
-          <div class="stat"><div class="stat-top"><span>Checklist</span><span class="stat-icon">☑</span></div><div class="stat-value" id="statChecks">0%</div><div class="stat-note">Progresso geral dos checklists</div></div>
-          <div class="stat"><div class="stat-top"><span>Eventos locais</span><span class="stat-icon">◷</span></div><div class="stat-value" id="statLogs">0</div><div class="stat-note">Histórico guardado neste navegador</div></div>
-        </div>
-        <div class="grid-main">
-          <section class="panel"><div class="panel-head"><div><h2>Itens recentes</h2><p>As últimas tarefas e atividades criadas.</p></div><button class="btn ghost" data-goto="tarefas">Ver tudo →</button></div><div class="panel-body"><div id="recentItems" class="task-list"></div></div></section>
-          <div class="side-panel">
-            <section class="panel"><div class="panel-head"><div><h2>Acesso rápido</h2><p>Crie e acompanhe seu trabalho.</p></div></div><div class="panel-body">
-              <div class="quick-item"><div class="quick-icon">☷</div><div><strong>Tarefas diárias</strong><span>Organize rotinas e checklists.</span></div></div>
-              <div class="quick-item"><div class="quick-icon">✦</div><div><strong>Atividades extras</strong><span>Registre demandas adicionais.</span></div></div>
-              <div class="quick-item"><div class="quick-icon">◷</div><div><strong>Registro de eventos</strong><span>Consulte as movimentações registradas.</span></div></div>
-            </div></section>
-            <section class="panel"><div class="panel-head"><div><h2>Conexão com o LOG</h2><p>Envio para o Google Planilhas</p></div></div><div class="panel-body"><div class="badges"><span class="badge blue" id="connectionBadge">● Configurada</span></div><p class="small-muted" style="margin-bottom:0">O navegador não consegue confirmar a resposta do Apps Script neste modo. Confira a aba LOG_GERAL para validar cada evento.</p></div></section>
-          </div>
-        </div>
-      </section>
-
-      <section id="page-tarefas" class="page hidden">
-        <div class="page-head"><div><div class="eyebrow">ROTINA</div><h1>Tarefas diárias</h1><p class="subtitle">Divida o trabalho em etapas claras e acompanhe o progresso.</p></div><button class="btn primary" id="newTask">＋ Criar tarefa</button></div>
-        <section class="panel"><div class="panel-head"><div><h2>Lista de tarefas</h2><p>Marque os itens conforme forem realizados.</p></div><div class="filters"><input id="searchTasks" placeholder="Buscar tarefa…"><select id="filterTasks"><option value="all">Todos os status</option><option value="Nova">Nova</option><option value="Em andamento">Em andamento</option><option value="Concluída">Concluída</option></select></div></div><div class="panel-body"><div id="taskList" class="task-list"></div></div></section>
-      </section>
-
-      <section id="page-atividades" class="page hidden">
-        <div class="page-head"><div><div class="eyebrow">DEMANDAS ADICIONAIS</div><h1>Atividades extras</h1><p class="subtitle">Mantenha as atividades adicionais separadas das rotinas diárias.</p></div><button class="btn primary" id="newActivity">＋ Criar atividade</button></div>
-        <section class="panel"><div class="panel-head"><div><h2>Lista de atividades</h2><p>Registre, atualize e conclua atividades extras.</p></div><div class="filters"><input id="searchActivities" placeholder="Buscar atividade…"><select id="filterActivities"><option value="all">Todos os status</option><option value="Nova">Nova</option><option value="Em andamento">Em andamento</option><option value="Concluída">Concluída</option></select></div></div><div class="panel-body"><div id="activityList" class="task-list"></div></div></section>
-      </section>
-
-      <section id="page-historico" class="page hidden">
-        <div class="page-head"><div><div class="eyebrow">AUDITORIA</div><h1>Registro de eventos</h1><p class="subtitle">Histórico local dos eventos realizados nesta interface. O envio para a planilha é tentado automaticamente.</p></div><button class="btn" id="exportLogs">↓ Exportar CSV</button></div>
-        <section class="panel"><div class="panel-head"><div><h2>Movimentações recentes</h2><p>Mais recentes primeiro.</p></div><div class="filters"><input id="searchLogs" placeholder="Buscar no histórico…"></div></div><div class="panel-body"><div id="logList" class="log-list"></div></div></section>
-      </section>
-
-      <section id="page-form" class="page hidden">
-        <div class="page-head"><div><div class="eyebrow">NOVO REGISTRO</div><h1 id="formTitle">Criar tarefa</h1><p class="subtitle">Preencha os dados e adicione os itens do checklist.</p></div><button class="btn ghost" id="cancelForm">← Voltar</button></div>
-        <section class="panel"><div class="panel-head"><div><h2>Detalhes</h2><p>Os campos com asterisco são obrigatórios.</p></div></div><div class="panel-body">
-          <form id="itemForm">
-            <div class="form-grid">
-              <div class="form-group full"><label for="itemTitle">Título *</label><input id="itemTitle" maxlength="300" required placeholder="Ex.: Conferir documentos recebidos"></div>
-              <div class="form-group full"><label for="itemDescription">Descrição (opcional)</label><textarea id="itemDescription" maxlength="3000" placeholder="Adicione detalhes importantes…"></textarea></div>
-              <div class="form-group"><label for="itemStatus">Status inicial</label><select id="itemStatus"><option>Nova</option><option>Em andamento</option></select></div>
-              <div class="form-group"><label>Categoria</label><input id="itemCategory" value="Tarefa diária" disabled></div>
-              <div class="form-group full"><label>Itens do checklist</label><div id="checkInputs" class="check-inputs"></div><button type="button" class="btn" id="addCheck" style="justify-self:start">＋ Adicionar item</button><p class="small-muted">Adicione pelo menos um item para acompanhar o progresso, ou deixe vazio para um registro simples.</p></div>
-            </div>
-            <div class="form-actions"><button type="button" class="btn ghost" id="cancelForm2">Cancelar</button><button type="submit" class="btn primary">Criar registro</button></div>
-          </form>
-        </div></section>
-      </section>
-    </div>
-  </main>
-</div>
-<div id="toast" class="toast hidden" role="status"></div>
+<div class="app"><aside class="side"><div class="brand">SISTEMA <span>TRT12</span><br><small>GESTÃO DE ATIVIDADES</small></div><nav class="nav" aria-label="Navegação"><button class="active" data-page="dashboard">▦ &nbsp; Painel geral</button><button data-page="diaria">☑ &nbsp; Tarefas diárias</button><button data-page="adicional">＋ &nbsp; Atividades adicionais</button><button data-page="logs">◷ &nbsp; Histórico / LOGS</button></nav></aside><main class="main"><header class="top"><strong>Ambiente de demonstração</strong><select id="role" class="role" aria-label="Cargo selecionado"><option>Jovem Aprendiz</option><option>Diretor de Secretaria</option></select></header><div class="content"><div class="eyebrow">CONTROLE OPERACIONAL</div><h1 id="pageTitle">Visão geral</h1><p class="muted" id="subtitle">Acompanhe as tarefas e atividades registradas neste navegador.</p><div class="notice">⚠️ Protótipo sem autenticação. Não insira dados pessoais, processuais ou sigilosos. O cargo selecionado é apenas visual, sem controle de acesso.</div><section id="dashboard"><div class="stats"><div class="stat"><small>Total de itens</small><b id="statTotal">0</b></div><div class="stat"><small>Concluídos</small><b id="statDone">0</b></div><div class="stat"><small>Pendentes</small><b id="statPending">0</b></div></div><div class="panel"><div class="panelhead"><h2>Atividade recente</h2></div><div id="recent"></div></div></section><section id="diaria" class="hidden"><div class="panel"><div class="panelhead"><h2>Tarefas diárias</h2><button class="primary" id="addDaily">+ Nova tarefa</button></div><div id="dailyList"></div></div></section><section id="adicional" class="hidden"><div class="panel"><div class="panelhead"><h2>Atividades adicionais</h2><button class="primary" id="addExtra">+ Nova atividade</button></div><div id="extraList"></div></div></section><section id="logs" class="hidden"><div class="panel"><div class="panelhead"><h2>Histórico de eventos</h2><button class="secondary" id="exportLogs">Exportar CSV</button></div><p class="hint">Histórico local deste navegador. Os envios para a planilha são tentados automaticamente; por limitações do Apps Script público, o navegador não consegue confirmar a gravação.</p><div id="logList"></div></div></section><section id="editor" class="panel hidden"><div class="panelhead"><h2 id="formTitle">Nova tarefa</h2><button class="secondary" id="cancelForm">Cancelar</button></div><form id="taskForm" class="formgrid"><label>Título<input id="title" class="field" required maxlength="150" placeholder="Ex.: Conferir documentos"></label><label>Descrição (opcional)<textarea id="description" class="field" maxlength="1500" placeholder="Detalhes da tarefa"></textarea></label><div id="dateFields" class="formrow hidden"><label>Data inicial<input id="startDate" type="date" class="field"></label><label>Data final<input id="endDate" type="date" class="field"></label></div><label>Itens do checklist (um por linha)<textarea id="checkItems" class="field" required placeholder="Conferir informações&#10;Revisar documentação"></textarea></label><div><button class="primary" type="submit">Salvar</button></div></form></section></div></main></div><div class="toast" id="toast" role="status"></div>
 <script>
-(() => {
-  "use strict";
-  const API_URL = "https://script.google.com/macros/s/AKfycbwACSGiQ74Gcmz5ujOsOym6dOdrRFI9NDF2haPOMZoESvV_wwtIbZs7Ujyra0jXPR0Z7Q/exec";
-  const STORAGE_KEY = "trt12_app_v1";
-  const LOG_KEY = "trt12_logs_v1";
-  let items = readJSON(STORAGE_KEY, []);
-  let logs = readJSON(LOG_KEY, []);
-  let formType = "Tarefa";
-  let lastPage = "tarefas";
-  let toastTimer;
-
-  function readJSON(key, fallback) {
-    try { const value = JSON.parse(localStorage.getItem(key)); return value ?? fallback; }
-    catch { return fallback; }
-  }
-  function save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); localStorage.setItem(LOG_KEY, JSON.stringify(logs)); }
-    catch { notify("Não foi possível salvar neste navegador. Verifique o espaço disponível.", "bad"); }
-  }
-  function uid() { return (crypto.randomUUID ? crypto.randomUUID() : "trt12-" + Date.now() + "-" + Math.random().toString(16).slice(2)); }
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  }
-  function nowISO() { return new Date().toISOString(); }
-  function dateLabel(value) {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? "Data indisponível" : date.toLocaleString("pt-BR", {dateStyle:"short",timeStyle:"short"});
-  }
-  function activeRole() { return document.getElementById("cargo").value; }
-  function notify(message, kind="good") {
-    const el = document.getElementById("toast");
-    el.textContent = message; el.className = "toast " + kind;
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.add("hidden"), 4200);
-  }
-  function sendToSheet(event) {
-    const payload = {
-      tipoEvento: event.tipoEvento,
-      categoria: event.categoria,
-      titulo: event.titulo,
-      descricao: event.descricao || "",
-      statusAnterior: event.statusAnterior || "",
-      statusAtual: event.statusAtual || "",
-      checklist: event.checklist || "",
-      cargoAtivo: event.cargoAtivo || activeRole(),
-      idItem: event.idItem || ""
-    };
-    // no-cors permite enviar sem ler a resposta. A planilha precisa ser conferida
-    // para confirmar a gravação; o navegador não consegue verificar a resposta.
-    try {
-      fetch(API_URL, {
-        method:"POST", mode:"no-cors",
-        headers:{"Content-Type":"text/plain;charset=utf-8"},
-        body:JSON.stringify(payload)
-      }).catch(() => {});
-    } catch (_) {}
-  }
-  function addLog(event, send=true) {
-    const entry = {
-      id:uid(), at:nowISO(), tipoEvento:event.tipoEvento, categoria:event.categoria,
-      titulo:event.titulo, descricao:event.descricao || "", statusAnterior:event.statusAnterior || "",
-      statusAtual:event.statusAtual || "", checklist:event.checklist || "",
-      cargoAtivo:event.cargoAtivo || activeRole(), idItem:event.idItem || ""
-    };
-    logs.unshift(entry); logs = logs.slice(0, 500); save();
-    if (send) sendToSheet(entry);
-    renderStats(); renderLogs();
-    return entry;
-  }
-  function itemEvent(item, tipoEvento, extras={}) {
-    return {
-      tipoEvento, categoria:item.tipo, titulo:item.titulo, descricao:item.descricao,
-      statusAnterior:extras.statusAnterior || "", statusAtual:extras.statusAtual ?? item.status,
-      checklist:item.checks.map(c => (c.done ? "[x] " : "[ ] ") + c.text).join(" | "),
-      cargoAtivo:activeRole(), idItem:item.id
-    };
-  }
-  function renderStats() {
-    const active = items.filter(i => i.status !== "Concluída").length;
-    const done = items.filter(i => i.status === "Concluída").length;
-    const totalChecks = items.reduce((n,i) => n + i.checks.length, 0);
-    const checked = items.reduce((n,i) => n + i.checks.filter(c=>c.done).length, 0);
-    document.getElementById("statActive").textContent = active;
-    document.getElementById("statDone").textContent = done;
-    document.getElementById("statChecks").textContent = totalChecks ? Math.round(checked/totalChecks*100)+"%" : "—";
-    document.getElementById("statLogs").textContent = logs.length;
-  }
-  function statusClass(status) { return status==="Concluída" ? "green" : status==="Em andamento" ? "amber" : "blue"; }
-  function cardHTML(item) {
-    const total = item.checks.length, checked = item.checks.filter(c=>c.done).length;
-    const percent = total ? Math.round(checked/total*100) : (item.status==="Concluída" ? 100 : 0);
-    return `<article class="task-card ${item.status==="Concluída"?"completed":""}">
-      <div class="task-top"><div style="min-width:0;flex:1">
-        <h3 class="task-title">${escapeHTML(item.titulo)}</h3>
-        <p class="task-desc">${escapeHTML(item.descricao || "Sem descrição adicional.")}</p>
-        <div class="badges"><span class="badge">${item.tipo==="Tarefa"?"☷ Tarefa diária":"✦ Atividade extra"}</span><span class="badge ${statusClass(item.status)}">${escapeHTML(item.status)}</span><span class="badge">${dateLabel(item.criadoEm)}</span></div>
-      </div><div class="task-actions">
-        <button class="btn" data-action="status" data-id="${item.id}">${item.status==="Concluída"?"Reabrir":"Alterar status"}</button>
-        <button class="btn danger" data-action="delete" data-id="${item.id}">Excluir</button>
-      </div></div>
-      ${total ? `<div><div class="progress-label"><span>Progresso do checklist</span><span>${checked}/${total} · ${percent}%</span></div><div class="progress-line"><span style="width:${percent}%"></span></div></div><div class="checklist">${item.checks.map((c,idx)=>`<label class="check-row ${c.done?"done":""}"><input type="checkbox" data-action="check" data-id="${item.id}" data-index="${idx}" ${c.done?"checked":""} ${item.status==="Concluída"?"disabled":""}><span>${escapeHTML(c.text)}</span></label>`).join("")}</div>` : `<p class="small-muted">Nenhum item de checklist adicionado.</p>`}
-    </article>`;
-  }
-  function renderItemLists() {
-    const taskSearch = (document.getElementById("searchTasks")?.value || "").toLowerCase();
-    const taskFilter = document.getElementById("filterTasks")?.value || "all";
-    const actSearch = (document.getElementById("searchActivities")?.value || "").toLowerCase();
-    const actFilter = document.getElementById("filterActivities")?.value || "all";
-    const tasks = items.filter(i=>i.tipo==="Tarefa" && i.titulo.toLowerCase().includes(taskSearch) && (taskFilter==="all"||i.status===taskFilter));
-    const acts = items.filter(i=>i.tipo==="Atividade" && i.titulo.toLowerCase().includes(actSearch) && (actFilter==="all"||i.status===actFilter));
-    document.getElementById("taskList").innerHTML = tasks.length ? tasks.map(cardHTML).join("") : `<div class="empty"><strong>Nenhuma tarefa encontrada</strong>Crie uma tarefa para começar a organizar sua rotina.</div>`;
-    document.getElementById("activityList").innerHTML = acts.length ? acts.map(cardHTML).join("") : `<div class="empty"><strong>Nenhuma atividade encontrada</strong>Suas atividades extras aparecerão aqui.</div>`;
-    const recent = [...items].sort((a,b)=>b.criadoEm.localeCompare(a.criadoEm)).slice(0,3);
-    document.getElementById("recentItems").innerHTML = recent.length ? recent.map(cardHTML).join("") : `<div class="empty"><strong>Seu painel está pronto</strong>Crie sua primeira tarefa ou atividade para começar.</div>`;
-  }
-  function renderLogs() {
-    const q = (document.getElementById("searchLogs")?.value || "").toLowerCase();
-    const filtered = logs.filter(l => [l.titulo,l.tipoEvento,l.categoria,l.descricao,l.cargoAtivo].join(" ").toLowerCase().includes(q));
-    document.getElementById("logList").innerHTML = filtered.length ? filtered.slice(0,200).map(l=>`<div class="log-row"><div class="log-date">${dateLabel(l.at)}<br>${escapeHTML(l.cargoAtivo)}</div><div><div class="log-title">${escapeHTML(l.tipoEvento)} · ${escapeHTML(l.titulo)}</div><div class="log-detail">${escapeHTML(l.categoria)}${l.statusAtual? " · Status: "+escapeHTML(l.statusAtual):""}${l.descricao?" · "+escapeHTML(l.descricao):""}</div></div><span class="badge ${l.tipoEvento.includes("conclu")?"green":"blue"}">${escapeHTML(l.categoria)}</span></div>`).join("") : `<div class="empty"><strong>Nenhum evento encontrado</strong>Os eventos realizados no sistema aparecerão aqui.</div>`;
-  }
-  function renderAll() { renderStats(); renderItemLists(); renderLogs(); }
-  function showPage(name) {
-    document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
-    const page = document.getElementById("page-"+name);
-    if(page) page.classList.remove("hidden");
-    document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
-    const names={inicio:"Painel geral",tarefas:"Tarefas diárias",atividades:"Atividades extras",historico:"Registro de eventos",form:"Novo registro"};
-    document.getElementById("crumbPage").textContent=names[name]||"Painel geral";
-    document.getElementById("sidebar").classList.remove("open");
-    if(name==="tarefas"||name==="atividades") lastPage=name;
-  }
-  function addCheckInput(value="") {
-    const row=document.createElement("div"); row.className="check-input-row";
-    const input=document.createElement("input"); input.placeholder="Descreva uma etapa do checklist"; input.maxLength=300; input.value=value; input.className="check-text";
-    const remove=document.createElement("button"); remove.type="button"; remove.className="btn danger"; remove.textContent="×"; remove.setAttribute("aria-label","Remover item");
-    remove.addEventListener("click",()=>row.remove());
-    row.append(input,remove); document.getElementById("checkInputs").append(row);
-  }
-  function openForm(type) {
-    formType=type; document.getElementById("formTitle").textContent=type==="Tarefa"?"Criar tarefa diária":"Criar atividade extra";
-    document.getElementById("itemCategory").value=type==="Tarefa"?"Tarefa diária":"Atividade extra";
-    document.getElementById("itemTitle").value=""; document.getElementById("itemDescription").value="";
-    document.getElementById("itemStatus").value="Nova"; document.getElementById("checkInputs").innerHTML="";
-    addCheckInput(); addCheckInput(); showPage("form");
-  }
-  function createItem(e) {
-    e.preventDefault();
-    const titulo=document.getElementById("itemTitle").value.trim();
-    if(!titulo){notify("Digite um título para continuar.","bad");return;}
-    const checks=[...document.querySelectorAll(".check-text")].map(el=>el.value.trim()).filter(Boolean).map(text=>({id:uid(),text,done:false}));
-    const item={id:uid(),tipo:formType,titulo,descricao:document.getElementById("itemDescription").value.trim(),status:document.getElementById("itemStatus").value,criadoEm:nowISO(),atualizadoEm:nowISO(),checks,completionLogged:false};
-    items.unshift(item);save();
-    addLog(itemEvent(item,formType==="Tarefa"?"Tarefa criada":"Atividade criada"));
-    renderAll();showPage(formType==="Tarefa"?"tarefas":"atividades");
-    notify((formType==="Tarefa"?"Tarefa":"Atividade")+" criada. O envio para a planilha foi solicitado.");
-  }
-  function completeItem(item) {
-    if(item.status==="Concluída" && !item.completionLogged) return;
-    const old=item.status; item.status="Concluída"; item.atualizadoEm=nowISO();
-    if(item.checks.length) item.checks.forEach(c=>c.done=true);
-    save();
-    addLog(itemEvent(item,item.tipo==="Tarefa"?"Tarefa concluída":"Atividade concluída",{statusAnterior:old,statusAtual:"Concluída"}));
-    item.completionLogged=true;save();
-    notify("Item concluído e evento enviado para a planilha.");
-  }
-  function updateStatus(item) {
-    const old=item.status;
-    if(old==="Concluída"){item.status="Em andamento";item.completionLogged=false;}
-    else if(old==="Nova") item.status="Em andamento";
-    else item.status="Concluída";
-    item.atualizadoEm=nowISO();
-    if(item.status==="Concluída" && item.checks.length) item.checks.forEach(c=>c.done=true);
-    save();
-    addLog(itemEvent(item,"Mudança de status",{statusAnterior:old,statusAtual:item.status}));
-    if(item.status==="Concluída" && !item.completionLogged){
-      addLog(itemEvent(item,item.tipo==="Tarefa"?"Tarefa concluída":"Atividade concluída",{statusAnterior:old,statusAtual:"Concluída"}));
-      item.completionLogged=true;save();
-    }
-    renderAll();notify("Status atualizado.");
-  }
-  function handleItemAction(event) {
-    const target=event.target;
-    const control=target.closest("[data-action]");
-    if(!control)return;
-    const item=items.find(i=>i.id===control.dataset.id);
-    if(!item)return;
-    const action=control.dataset.action;
-    if(action==="check"){
-      const check=item.checks[Number(control.dataset.index)];
-      if(!check || item.status==="Concluída")return;
-      check.done=control.checked;item.atualizadoEm=nowISO();
-      item.status=item.checks.length && item.checks.every(c=>c.done)?"Concluída":(item.checks.some(c=>c.done)?"Em andamento":"Nova");
-      save();
-      addLog(itemEvent(item,"Item do checklist marcado",{statusAtual:item.status,descricao:(check.done?"Marcado: ":"Desmarcado: ")+check.text}));
-      if(item.status==="Concluída" && !item.completionLogged){
-        addLog(itemEvent(item,item.tipo==="Tarefa"?"Tarefa concluída":"Atividade concluída",{statusAnterior:"Em andamento",statusAtual:"Concluída"}));
-        item.completionLogged=true;save();notify("Checklist completo! Item concluído e enviado ao LOG.");
-      } else { renderAll(); }
-      return;
-    }
-    if(action==="status"){updateStatus(item);return;}
-    if(action==="delete"){
-      if(!confirm("Excluir este item do navegador? O histórico já enviado não será apagado."))return;
-      items=items.filter(i=>i.id!==item.id);save();
-      addLog(itemEvent(item,"Mudança de status",{statusAnterior:item.status,statusAtual:"Excluída",descricao:"Item removido da lista local."}));
-      renderAll();notify("Item excluído da lista local.");
-    }
-  }
-  function exportCSV() {
-    const header=["Data e hora","Tipo de evento","Categoria","Título","Descrição","Status anterior","Status atual","Checklist","Cargo ativo","ID do item"];
-    const rows=logs.map(l=>[dateLabel(l.at),l.tipoEvento,l.categoria,l.titulo,l.descricao,l.statusAnterior,l.statusAtual,l.checklist,l.cargoAtivo,l.idItem]);
-    const csv=[header,...rows].map(row=>row.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\r\n");
-    const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
-    const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="SISTEMA-TRT12-LOG.csv";a.click();URL.revokeObjectURL(url);
-  }
-
-  document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
-  document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.goto)));
-  document.getElementById("newTask").addEventListener("click",()=>openForm("Tarefa"));
-  document.getElementById("newActivity").addEventListener("click",()=>openForm("Atividade"));
-  document.getElementById("quickCreate").addEventListener("click",()=>openForm("Tarefa"));
-  document.getElementById("addCheck").addEventListener("click",()=>addCheckInput());
-  document.getElementById("itemForm").addEventListener("submit",createItem);
-  document.getElementById("cancelForm").addEventListener("click",()=>showPage(lastPage));
-  document.getElementById("cancelForm2").addEventListener("click",()=>showPage(lastPage));
-  document.getElementById("taskList").addEventListener("change",handleItemAction);
-  document.getElementById("activityList").addEventListener("change",handleItemAction);
-  document.getElementById("recentItems").addEventListener("change",handleItemAction);
-  document.getElementById("taskList").addEventListener("click",handleItemAction);
-  document.getElementById("activityList").addEventListener("click",handleItemAction);
-  document.getElementById("recentItems").addEventListener("click",handleItemAction);
-  ["searchTasks","filterTasks","searchActivities","filterActivities"].forEach(id=>document.getElementById(id).addEventListener("input",renderItemLists));
-  document.getElementById("searchLogs").addEventListener("input",renderLogs);
-  document.getElementById("exportLogs").addEventListener("click",exportCSV);
-  document.getElementById("cargo").addEventListener("change",()=>{
-    document.getElementById("avatar").textContent=activeRole()==="Diretor de Secretaria"?"DS":"JA";
-    notify("Cargo ativo alterado para "+activeRole()+".");
-  });
-  document.getElementById("menuBtn").addEventListener("click",()=>document.getElementById("sidebar").classList.toggle("open"));
-  renderAll();
-})();
+'use strict';
+// Endpoint público de teste. NÃO utilizar para informações sensíveis.
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzaXgGSjXuMd3BRCVa_oVnw3k9ARS1QN7064W54R2xpm7sw-28CJoMHdvSz9mzZvaCYLQ/exec';
+const STORAGE='trt12_demo_v1';
+const $=id=>document.getElementById(id);
+const safeParse=(s,f)=>{try{return JSON.parse(s)||f}catch{return f}};
+let state=safeParse(localStorage.getItem(STORAGE),{tasks:[],logs:[],role:'Jovem Aprendiz'});
+if(!Array.isArray(state.tasks))state.tasks=[];if(!Array.isArray(state.logs))state.logs=[];
+let currentPage='dashboard',formType='diaria';
+const save=()=>localStorage.setItem(STORAGE,JSON.stringify(state));
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const stamp=()=>new Date().toLocaleString('pt-BR');
+const dateStr=d=>new Date(d).toLocaleDateString('pt-BR');
+const elapsed=t=>{let ms=Date.now()-new Date(t).getTime();if(ms<0||!Number.isFinite(ms))return '—';let mins=Math.floor(ms/60000);if(mins<60)return mins+' min';let hours=Math.floor(mins/60);if(hours<24)return hours+' h '+mins%60+' min';return Math.floor(hours/24)+' d '+hours%24+' h'};
+function toast(message){$('toast').textContent=message;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),4000)}
+async function sendToSheet(event){
+  // A resposta é opaca em no-cors: sucesso de fetch não prova gravação no Sheets.
+  try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tipo:event.type,tarefa:event.title,status:event.status,concluida:event.completed,duracao:event.duration,data:event.date,horario:event.time})});return 'enviado_sem_confirmacao'}catch{return 'falha_de_rede'}
+}
+function record(type,title,status,completed=false,duration='—'){
+ const now=new Date(),event={id:crypto.randomUUID(),type,title,status,completed,duration,date:now.toLocaleDateString('pt-BR'),time:now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),createdAt:now.toISOString(),sync:'pendente'};
+ state.logs.unshift(event);save();render();sendToSheet(event).then(result=>{event.sync=result;save();if(result==='falha_de_rede')toast('Sem conexão: o evento ficou somente no histórico local.');render()});
+}
+function showPage(page){currentPage=page;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));['dashboard','diaria','adicional','logs'].forEach(id=>$(id).classList.toggle('hidden',id!==page));$('editor').classList.add('hidden');const names={dashboard:['Visão geral','Acompanhe as tarefas e atividades registradas neste navegador.'],diaria:['Tarefas diárias','Organize os checklists de rotina.'],adicional:['Atividades adicionais','Registre atividades extraordinárias e seus períodos.'],logs:['Histórico / LOGS','Acompanhe os eventos gerados neste navegador.']};$('pageTitle').textContent=names[page][0];$('subtitle').textContent=names[page][1];render()}
+function openForm(type){formType=type;$('taskForm').reset();$('formTitle').textContent=type==='diaria'?'Nova tarefa diária':'Nova atividade adicional';$('dateFields').classList.toggle('hidden',type==='diaria');$('editor').classList.remove('hidden');$('editor').scrollIntoView({behavior:'smooth',block:'start'});$('title').focus()}
+function renderTasks(type,target){let tasks=state.tasks.filter(t=>t.type===type);$(target).innerHTML=tasks.length?tasks.map(t=>{const completed=t.items.every(i=>i.done),sent=!!t.sentAt;return `<article class="entry"><div class="entrytop"><div><h3>${escapeHtml(t.title)}</h3><div class="desc">${escapeHtml(t.description)}</div></div><span class="pill ${completed?'ok':''}">${sent?'Enviado ao LOGS':completed?'Concluída':'Em andamento'}</span></div>${t.type==='adicional'?`<div class="meta">Período: ${escapeHtml(t.startDate||'—')} até ${escapeHtml(t.endDate||'—')}</div>`:''}<div class="checks">${t.items.map((item,i)=>`<label class="${item.done?'done':''}"><input type="checkbox" data-check="${escapeHtml(t.id)}" data-index="${i}" ${item.done?'checked':''}><span>${escapeHtml(item.text)}</span></label>`).join('')}</div><div class="meta">Criado em ${dateStr(t.createdAt)} · ${t.items.filter(i=>i.done).length}/${t.items.length} itens concluídos</div><div class="actions"><button class="primary" data-send="${escapeHtml(t.id)}" ${!completed||sent?'disabled':''}>${sent?'Checklist registrado':'Enviar checklist ao LOGS'}</button><button class="danger" data-delete="${escapeHtml(t.id)}">Excluir</button></div></article>`}).join(''):'<div class="empty">Nenhum item cadastrado ainda. Clique em “Novo” para começar.</div>'}
+function render(){const total=state.tasks.length,done=state.tasks.filter(t=>t.items.every(i=>i.done)).length;$('statTotal').textContent=total;$('statDone').textContent=done;$('statPending').textContent=total-done;renderTasks('diaria','dailyList');renderTasks('adicional','extraList');const logMarkup=(e)=>`<div class="log"><strong>${escapeHtml(e.title)}</strong> <span class="pill">${escapeHtml(e.type)}</span><div class="meta">${escapeHtml(e.status)} · ${e.completed?'Concluída':'Não concluída'} · ${escapeHtml(e.duration)}</div><time>${escapeHtml(e.date)} às ${escapeHtml(e.time)}</time> · <span class="hint">${e.sync==='falha_de_rede'?'Falha de rede':e.sync==='pendente'?'Envio pendente':'Envio solicitado (não confirmado)'}</span></div>`;$('logList').innerHTML=state.logs.length?state.logs.map(logMarkup).join(''):'<div class="empty">Ainda não há eventos registrados.</div>';$('recent').innerHTML=state.logs.length?state.logs.slice(0,5).map(logMarkup).join(''):'<div class="empty">Nenhuma atividade recente.</div>'}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+$('addDaily').onclick=()=>openForm('diaria');$('addExtra').onclick=()=>openForm('adicional');$('cancelForm').onclick=()=>$('editor').classList.add('hidden');$('role').value=state.role;$('role').onchange=e=>{state.role=e.target.value;save();toast('Cargo visual alterado. Isso não modifica permissões.')};
+$('taskForm').onsubmit=e=>{e.preventDefault();const title=$('title').value.trim(),description=$('description').value.trim(),items=$('checkItems').value.split('\n').map(s=>s.trim()).filter(Boolean).map(text=>({text,done:false}));if(!title||!items.length)return toast('Informe o título e pelo menos um item de checklist.');const task={id:crypto.randomUUID(),type:formType,title,description,items,startDate:$('startDate').value,endDate:$('endDate').value,createdAt:new Date().toISOString(),sentAt:null};if(formType==='adicional'&&task.startDate&&task.endDate&&task.endDate<task.startDate)return toast('A data final deve ser igual ou posterior à inicial.');state.tasks.unshift(task);save();$('editor').classList.add('hidden');record(formType==='diaria'?'Tarefa':'Atividade',title,'Criada',false);toast('Item criado. Evento enviado ao LOGS (sem confirmação de gravação).')};
+document.addEventListener('change',e=>{const el=e.target;if(!el.matches('[data-check]'))return;const t=state.tasks.find(x=>x.id===el.dataset.check),i=Number(el.dataset.index);if(!t||!t.items[i])return;const before=t.items.every(x=>x.done);t.items[i].done=el.checked;const after=t.items.every(x=>x.done);save();record(t.type==='diaria'?'Tarefa':'Atividade',t.title,after?'Concluída':before?'Reaberta':'Status alterado',after,after?elapsed(t.createdAt):'—')});
+document.addEventListener('click',e=>{const send=e.target.closest('[data-send]'),del=e.target.closest('[data-delete]');if(send){const t=state.tasks.find(x=>x.id===send.dataset.send);if(!t||t.sentAt||!t.items.every(x=>x.done))return;t.sentAt=new Date().toISOString();save();record(t.type==='diaria'?'Tarefa':'Atividade',t.title,'Checklist enviado',true,elapsed(t.createdAt));toast('Checklist registrado no histórico e envio solicitado.')}if(del){const t=state.tasks.find(x=>x.id===del.dataset.delete);if(!t||!confirm('Excluir este item do navegador? O histórico já registrado será preservado.'))return;state.tasks=state.tasks.filter(x=>x.id!==t.id);save();record(t.type==='diaria'?'Tarefa':'Atividade',t.title,'Excluída',false);toast('Item excluído.')}});
+$('exportLogs').onclick=()=>{const rows=[['DATA','HORÁRIO','TIPO','TAREFAS // ATIVIDADE','STATUS','CONCLUÍDA','DURAÇÃO'],...state.logs.map(e=>[e.date,e.time,e.type,e.title,e.status,e.completed?'Sim':'Não',e.duration])];const csv='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='logs-trt12.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+showPage('dashboard');
 </script>
-</body>
-</html>
+</body></html>
