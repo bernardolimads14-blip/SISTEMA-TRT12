@@ -186,6 +186,14 @@ body{background:radial-gradient(circle at 80% -10%,#163552 0%,#0a121e 43%,#090f1
 .task-edit-button:focus-visible{outline:2px solid #8fc7ff;outline-offset:3px}
 .task-edit-button svg{height:16px;width:16px;flex:none}
 @media(max-width:600px){.entry-head-actions{justify-content:flex-start}.entrytop{flex-wrap:wrap}.task-edit-button{padding:9px 10px}}
+
+/* Ação individual dos LOGS, apenas neste navegador. */
+.log-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.log-delete-one{display:inline-flex;align-items:center;gap:6px;border:1px solid #744256;border-radius:8px;background:#2b1c30;color:#f4b7c3;padding:7px 10px;font:700 11px 'Segoe UI',Arial,sans-serif;cursor:pointer;white-space:nowrap}
+.log-delete-one:hover{background:#522639;color:#fff;border-color:#b45b72}
+.log-delete-one:focus-visible{outline:2px solid #9bcfff;outline-offset:2px}
+.log-delete-one svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-linejoin:round;stroke-linecap:round;stroke-width:1.8}
+@media(max-width:680px){.log-main{align-items:flex-start;flex-wrap:wrap}.log-actions{width:100%;justify-content:space-between}}
 </style>
 </head>
 <body>
@@ -213,7 +221,7 @@ body{background:radial-gradient(circle at 80% -10%,#163552 0%,#0a121e 43%,#090f1
 <div class="panel content-panel"><div class="panelhead"><div><h2>Acompanhamento das atividades</h2><p>Envie atualizações e finalize a atividade quando terminar.</p></div></div><div class="list-toolbar"><input aria-label="Buscar atividade adicional" class="simple-search" id="extraSearch" placeholder="Buscar atividade pelo nome"/><div aria-label="Filtrar atividades adicionais" class="segment-filters" role="group"><button class="filter-button active" data-extra-filter="all" type="button">Todas</button><button class="filter-button" data-extra-filter="progress" type="button">Em andamento</button><button class="filter-button" data-extra-filter="done" type="button">Concluídas</button></div></div><div id="extraList"></div></div>
 </section><section class="hidden" id="logs">
 <div class="module-hero"><div><span class="module-kicker">03 · HISTÓRICO</span><h2>Conclusões e andamentos</h2><p>Acompanhe as tarefas concluídas e as mensagens de andamento das atividades adicionais.</p></div><div class="actions compact"><button class="secondary" id="exportLogs">Exportar CSV</button><button class="danger" id="clearLocalLogs" type="button">Limpar LOGS deste navegador</button></div></div>
-<div class="panel content-panel"><div class="panelhead"><div><h2>Registros recentes</h2><p>Somente atualizações e conclusões importantes, salvas neste navegador.</p></div></div><div class="list-toolbar"><div aria-label="Filtrar histórico" class="segment-filters" role="group"><button class="filter-button active" data-log-filter="all" type="button">Todos</button><button class="filter-button" data-log-filter="done" type="button">Concluídas</button><button class="filter-button" data-log-filter="progress" type="button">Em andamento</button></div><a class="secondary linkbutton" href="https://docs.google.com/spreadsheets/d/1CSixvM-GJR6uMKT-0IwR7h2SxS-MQPjJ2PVngBx2WyQ/edit" rel="noopener noreferrer" target="_blank">Conferir na planilha ↗</a></div><div class="local-log-note">Apagar aqui não exclui nenhum registro da planilha Google.</div><div id="logList"></div></div>
+<div class="panel content-panel"><div class="panelhead"><div><h2>Registros recentes</h2><p>Somente atualizações e conclusões importantes, salvas neste navegador.</p></div></div><div class="list-toolbar"><div aria-label="Filtrar histórico" class="segment-filters" role="group"><button class="filter-button active" data-log-filter="all" type="button">Todos</button><button class="filter-button" data-log-filter="done" type="button">Concluídas</button><button class="filter-button" data-log-filter="progress" type="button">Em andamento</button></div><a class="secondary linkbutton" href="https://docs.google.com/spreadsheets/d/1CSixvM-GJR6uMKT-0IwR7h2SxS-MQPjJ2PVngBx2WyQ/edit" rel="noopener noreferrer" target="_blank">Conferir na planilha ↗</a></div><div class="local-log-note">Use <strong>Apagar</strong> em um registro para removê-lo só deste navegador. Nenhuma exclusão é enviada à planilha Google.</div><div id="logList"></div></div>
 </section><section class="hidden" id="triagem">
 <div class="panel triage-panel" id="triageStart">
 <div class="panelhead"><div><h2>Iniciar triagem</h2><p class="hint">Conferência orientada de autor e réu</p></div><span class="pill">Etapa 01</span></div>
@@ -246,7 +254,7 @@ body{background:radial-gradient(circle at 80% -10%,#163552 0%,#0a121e 43%,#090f1
 <label class="editor-label" for="description"><span id="descriptionLabel">Detalhes (opcional)</span><textarea class="field" id="description" maxlength="1500" placeholder="Escreva um resumo curto..."></textarea></label>
 <div class="formrow hidden" id="dateFields"><div class="date-editor"><label for="startDate">Data inicial <span class="date-automatic">automática</span></label><div class="date-input-row"><input class="field" id="startDate" type="date"/><button class="secondary date-today-button" id="startDateToday" type="button">Hoje</button></div><small>Preenchida com a data atual, mas pode ser alterada.</small></div><div class="date-editor"><label for="endDate">Data prevista para terminar (opcional)</label><input class="field" id="endDate" type="date"/><small>Se não souber a data, deixe em branco.</small></div></div>
 <label class="editor-label" for="checkItems" id="checklistField"><span>Etapas para concluir <small class="inline-optional">(uma por linha)</small></span><textarea class="field" id="checkItems" placeholder="Conferir informações
-Revisar documentos"></textarea><span class="field-help">Essas etapas viram caixas que você poderá marcar.</span></label>
+Revisar documentos"></textarea><span class="field-help">Essas etapas ficam só neste navegador. A planilha recebe apenas o nome e os detalhes da tarefa.</span></label>
 <div class="editor-actions"><button class="primary" id="formSubmit" type="submit">Salvar tarefa diária</button><button class="secondary hidden" id="saveAndNewExtra" type="submit">Salvar e criar outra</button><button class="secondary" id="cancelFormBottom" type="button">Cancelar</button></div>
 </form>
 </section>
@@ -283,6 +291,11 @@ function brazilianDay(iso){
 }
 
 const newId=()=>globalThis.crypto?.randomUUID?.()||('id-'+Date.now()+'-'+Math.random().toString(36).slice(2,12));
+// Atualiza IDs dos LOGS antigos sem apagar o histórico do navegador.
+if(state.logs.some(log=>log&&!log.id)){
+ state.logs=state.logs.map(log=>log&&!log.id?{...log,id:newId()}:log);
+ save();
+}
 const dateStr=d=>new Date(d).toLocaleDateString('pt-BR');
 const elapsed=(t,end)=>{let ms=new Date(end||Date.now()).getTime()-new Date(t).getTime();if(ms<0||!Number.isFinite(ms))return '—';let mins=Math.floor(ms/60000);if(mins<60)return mins+' min';let hours=Math.floor(mins/60);if(hours<24)return hours+' h '+mins%60+' min';return Math.floor(hours/24)+' d '+hours%24+' h'};
 const clock=t=>t?new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
@@ -296,7 +309,8 @@ function taskPayload(t,acao,extra={}){
  return {acao,id:t.id,tipo:t.type,titulo:t.title,descricao:t.description,
   dataInicial:t.startDate,dataFinal:t.endDate,inicio:t.startedAt,fim:t.finishedAt,
   marcado:!!(t.items?.length&&t.items.every(i=>i.done)),ciclo:Number(t.ciclo||0),
-  itens:(t.items||[]).map(i=>String(i.text||'')),...extra};
+  // O checklist pertence somente ao navegador; NÃO enviar 'itens' ao Sheets.
+  ...extra};
 }
 function syncTask(t,acao,extra={}){
  return sendToSheet(taskPayload(t,acao,extra)).then(result=>{
@@ -462,7 +476,8 @@ function render(){
    const complete=e.completed===true||/conclu/i.test(e.status||'');
    const obs=String(e.observation||(!['CONCLUÍDA','EM ANDAMENTO'].includes(e.status)?e.status:'')||'');
    const kind=e.type==='Tarefa diária'?'Tarefa diária':'Atividade adicional';
-   return '<div class="log-line"><div class="log-main"><strong>'+escapeHtml(e.title)+'</strong><span class="pill '+(complete?'status-done':'status-progress')+'">'+(complete?'CONCLUÍDA':'EM ANDAMENTO')+'</span></div><div class="log-sub">'+escapeHtml(kind)+' · '+escapeHtml(e.date)+' às '+escapeHtml(e.time)+(e.duration&&e.duration!=='—'?' · '+escapeHtml(e.duration):'')+'</div>'+(obs?'<p class="log-text">'+escapeHtml(obs)+'</p>':'')+'</div>';
+   const removeBtn='<button type="button" class="log-delete-one" data-delete-local-log="'+escapeHtml(e.id)+'" title="Apagar só este registro do navegador" aria-label="Apagar somente este registro do navegador"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 4h4M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>Apagar</button>';
+   return '<div class="log-line"><div class="log-main"><strong>'+escapeHtml(e.title)+'</strong><div class="log-actions"><span class="pill '+(complete?'status-done':'status-progress')+'">'+(complete?'CONCLUÍDA':'EM ANDAMENTO')+'</span>'+removeBtn+'</div></div><div class="log-sub">'+escapeHtml(kind)+' · '+escapeHtml(e.date)+' às '+escapeHtml(e.time)+(e.duration&&e.duration!=='—'?' · '+escapeHtml(e.duration):'')+'</div>'+(obs?'<p class="log-text">'+escapeHtml(obs)+'</p>':'')+'</div>';
  };
  const meaningful=state.logs.filter(isMeaningfulLog);
  const shown=meaningful.filter(e=>logFilter==='all'||(logFilter==='done'?(e.completed===true||/conclu/i.test(e.status||'')):!(e.completed===true||/conclu/i.test(e.status||''))));
@@ -528,7 +543,7 @@ document.addEventListener('change',e=>{
  const el=e.target;if(!el.matches('[data-check]'))return;
  const t=state.tasks.find(x=>x.id===el.dataset.check),i=Number(el.dataset.index);
  if(!t||!t.startedAt||t.finishedAt||!t.items[i])return;
- t.items[i].done=el.checked;save();render();syncTask(t,'checklist');
+ t.items[i].done=el.checked;save();render(); // Etapas marcadas ficam somente neste navegador.
 });
 document.addEventListener('submit',e=>{
  const form=e.target.closest('form[data-update-form]');
@@ -609,6 +624,18 @@ document.addEventListener('click',e=>{
  toast('Tarefa diária concluída aqui. Confira o registro na aba LOGS.');}
  if(repeat){const t=state.tasks.find(x=>x.id===repeat.dataset.repeat);if(!t||t.type!=='diaria'||!t.finishedAt)return;t.startedAt=null;t.finishedAt=null;t.sentAt=null;t.items=(t.items||[]).map(i=>({...i,done:false}));save();syncTask(t,'reabrir');render();toast('Tarefa reaberta. Confira a atualização na planilha.');}
   if(del){const t=state.tasks.find(x=>x.id===del.dataset.delete);void deleteTaskEverywhere(t,del);}
+});
+// Apaga UM registro apenas da lista LOGS local. Não envia requisição à planilha.
+document.addEventListener('click',e=>{
+ const btn=e.target.closest('[data-delete-local-log]');
+ if(!btn)return;
+ const id=btn.dataset.deleteLocalLog;
+ const selected=state.logs.find(log=>String(log.id)===id);
+ if(!selected)return toast('Registro já não existe neste navegador.');
+ if(!confirm('Apagar apenas este registro do LOG deste navegador?\n\nA planilha Google, as tarefas e os demais LOGS não serão alterados.'))return;
+ state.logs=state.logs.filter(log=>String(log.id)!==id);
+ save();render();
+ toast('Registro apagado somente do LOG deste navegador.');
 });
 $('clearLocalLogs').onclick=()=>{
  if(!state.logs.length)return toast('Os LOGS deste navegador já estão vazios.');
